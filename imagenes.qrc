@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>fondos/Ingresar.png</file>
+        <file>fondos/main.png</file>
+    </qresource>
+</RCC>
