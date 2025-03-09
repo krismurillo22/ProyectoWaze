@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -87,14 +87,183 @@ border: none;</string>
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="comboBoxOrigen">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>190</y>
+        <width>171</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);
+font: 75 14pt &quot;Segoe UI&quot;;
+border: rgb(255, 255, 255);
+color: rgb(0, 64, 143);</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="origen">
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>70</y>
+        <y>150</y>
         <width>151</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 16pt &quot;Segoe UI Black&quot;;</string>
+      </property>
+      <property name="text">
+       <string>ORIGEN:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="destino">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>260</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 16pt &quot;Segoe UI Black&quot;;</string>
+      </property>
+      <property name="text">
+       <string>DESTINO:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBoxDestino">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>171</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);
+font: 75 14pt &quot;Segoe UI&quot;;
+border: rgb(255, 255, 255);
+color: rgb(0, 64, 143);</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tipoDe">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>370</y>
+        <width>151</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 16pt &quot;Segoe UI Black&quot;;</string>
+      </property>
+      <property name="text">
+       <string>TIPO DE</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="transporte">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>400</y>
+        <width>151</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 16pt &quot;Segoe UI Black&quot;;</string>
+      </property>
+      <property name="text">
+       <string>TRANSPORTE:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBoxTipoTransporte">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>440</y>
+        <width>171</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);
+font: 75 14pt &quot;Segoe UI&quot;;
+border: rgb(255, 255, 255);
+color: rgb(0, 64, 143);</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Vehículo Particular</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Transporte Público</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>171</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 14pt &quot;Segoe UI Black&quot;;
+background-color: rgb(85, 0, 55);</string>
+      </property>
+      <property name="text">
+       <string>RESTABLECER</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>640</y>
+        <width>171</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 12pt &quot;Segoe UI Black&quot;;
+background-color: rgb(0, 0, 91);</string>
+      </property>
+      <property name="text">
+       <string>CALCULAR RUTA</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="origen_2">
+      <property name="geometry">
+       <rect>
+        <x>1100</x>
+        <y>40</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
+font: 87 16pt &quot;Segoe UI Black&quot;;</string>
+      </property>
+      <property name="text">
+       <string>DETALLES: </string>
       </property>
      </widget>
     </widget>
@@ -109,22 +278,27 @@ border: none;</string>
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuMENU">
+   <widget class="QMenu" name="menuCARGAR">
     <property name="title">
      <string>CARGAR MAPA</string>
     </property>
+    <addaction name="actionCARGAR"/>
    </widget>
    <widget class="QMenu" name="menuCONFIGURACION">
     <property name="title">
      <string>CONFIGURACION</string>
     </property>
+    <addaction name="actionCAMBIAR_CONDICIONES"/>
+    <addaction name="actionCAMBIAR_COLOR_A_LAS_RUTAS"/>
+    <addaction name="actionPRIORIZAR_RUTAS_CORTAS"/>
    </widget>
    <widget class="QMenu" name="menuAYUDA">
     <property name="title">
      <string>AYUDA</string>
     </property>
+    <addaction name="actionGUIA"/>
    </widget>
-   <addaction name="menuMENU"/>
+   <addaction name="menuCARGAR"/>
    <addaction name="menuCONFIGURACION"/>
    <addaction name="menuAYUDA"/>
   </widget>
@@ -132,6 +306,26 @@ border: none;</string>
   <action name="actionCARGAR">
    <property name="text">
     <string>CARGAR</string>
+   </property>
+  </action>
+  <action name="actionCAMBIAR_CONDICIONES">
+   <property name="text">
+    <string>CAMBIAR CONDICIONES</string>
+   </property>
+  </action>
+  <action name="actionCAMBIAR_COLOR_A_LAS_RUTAS">
+   <property name="text">
+    <string>CAMBIAR COLOR A LAS RUTAS</string>
+   </property>
+  </action>
+  <action name="actionPRIORIZAR_RUTAS_CORTAS">
+   <property name="text">
+    <string>PRIORIZAR RUTAS CORTAS</string>
+   </property>
+  </action>
+  <action name="actionGUIA">
+   <property name="text">
+    <string>GUIA</string>
    </property>
   </action>
  </widget>

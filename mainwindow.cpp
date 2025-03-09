@@ -13,21 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mapaWidget = ui->stackedWidget->widget(1);
-
-    // En el constructor
-    scene = new QGraphicsScene(this);
-    scene->setSceneRect(0, 0, 1280, 720); // Ajustar la escena al tamaño del mapa
-    QGraphicsView *view = new QGraphicsView(scene, mapaWidget);
-    view->setGeometry(0, 0, 1280, 720);
-    view->setStyleSheet("background: transparent;"); // Fondo transparente
-    view->setRenderHint(QPainter::Antialiasing);
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->show();
-
-    inicializarCiudades();
-    dibujarGrafo();
 }
 
 MainWindow::~MainWindow()
@@ -86,13 +71,45 @@ void MainWindow::inicializarCiudades() {
     agregarCiudad("Choluteca", 506, 552);
     agregarCiudad("San Pedro Sula", 394, 242);
     agregarCiudad("Santa Barbara", 365, 325);
+    agregarCiudad("La Lima", 411, 254);
+    agregarCiudad("Tela", 478, 209);
+    agregarCiudad("La Ceiba", 563, 211);
+    agregarCiudad("El Progreso", 425, 263);
+    agregarCiudad("Morazan", 456, 273);
+    agregarCiudad("Santa Rita", 415, 285);
+    agregarCiudad("Yoro", 515, 298);
+    agregarCiudad("Olanchito", 593, 248);
+    agregarCiudad("Trujillo", 679, 191);
+    agregarCiudad("Sonaguera", 631, 233);
+    agregarCiudad("Tocoa", 664, 236);
+    agregarCiudad("Barra Patuca", 902, 205);
+    agregarCiudad("Puerto Lempira", 964, 281);
+    agregarCiudad("Catacamas", 712, 326);
+    agregarCiudad("Juticalpa", 683, 343);
+    agregarCiudad("Valencia", 772, 357);
+    agregarCiudad("La Entrada", 292, 312);
+    agregarCiudad("Copan", 241, 338);
+    agregarCiudad("Santa Rosa de Copan", 290, 348);
+    agregarCiudad("Gracias", 320, 376);
+    agregarCiudad("Nuevo Ocotepeque", 236, 393);
+    agregarCiudad("La Esperanza", 372, 415);
+    agregarCiudad("La Paz", 440, 414);
+    agregarCiudad("Marcala", 393, 436);
+    agregarCiudad("Siguatepeque", 435, 382);
+    agregarCiudad("Comayagua", 448, 395);
+    agregarCiudad("Gualmaca", 553, 380);
+    agregarCiudad("Talanga", 523, 402);
+    agregarCiudad("Tegucigalpa", 503, 444);
+    agregarCiudad("Danli", 590, 452);
+    agregarCiudad("Yuscaran", 554, 467);
+    agregarCiudad("Nacaome", 466, 522);
+    agregarCiudad("San Lorenzo", 472, 537);
 
     // Agregar aristas con puntos intermedios
     QVector<QPoint> puntosIntermedios;
     puntosIntermedios.push_back(QPoint(406, 206));
     puntosIntermedios.push_back(QPoint(400, 210));
-    grafo.agregarArista(0, 1, puntosIntermedios); // Puerto Cortes -> Omoa
-    update();
+    grafo.agregarArista(0, 1, puntosIntermedios); // Puerto Cortes3 -> Omoa
 
     puntosIntermedios.clear();
     puntosIntermedios.push_back(QPoint(392, 250));
@@ -105,10 +122,50 @@ void MainWindow::inicializarCiudades() {
     puntosIntermedios.push_back(QPoint(350, 315));
     puntosIntermedios.push_back(QPoint(352, 327));
     grafo.agregarArista(4, 5, puntosIntermedios); // sps -> santa barbara
-    update();
+
+    puntosIntermedios.clear();
+    puntosIntermedios.push_back(QPoint(420, 202));
+    puntosIntermedios.push_back(QPoint(427, 206));
+    puntosIntermedios.push_back(QPoint(428, 212));
+    puntosIntermedios.push_back(QPoint(428,218));
+    puntosIntermedios.push_back(QPoint(422, 224));
+    puntosIntermedios.push_back(QPoint(416, 223));
+    puntosIntermedios.push_back(QPoint(410, 225));
+    grafo.agregarArista(0, 2, puntosIntermedios); // Puerto Cortes -> Choloma
+
+    puntosIntermedios.clear();
+    puntosIntermedios.push_back(QPoint(402, 235));
+    puntosIntermedios.push_back(QPoint(400, 240));
+    grafo.agregarArista(2, 4, puntosIntermedios); // Choloma -> SPS
+
+    puntosIntermedios.clear();
+    puntosIntermedios.push_back(QPoint(401, 249));
+    puntosIntermedios.push_back(QPoint(406, 251));
+    grafo.agregarArista(4, 6, puntosIntermedios); // SPS -> lima
+
+    puntosIntermedios.clear();
 }
 
+void MainWindow::on_actionCARGAR_triggered()
+{
+    mapaWidget = ui->stackedWidget->widget(1);
 
+    // En el constructor
+    scene = new QGraphicsScene(this);
+    scene->setSceneRect(0, 0, 1280, 720); // Ajustar la escena al tamaño del mapa
+    QGraphicsView *view = new QGraphicsView(scene, mapaWidget);
+    view->setGeometry(0, 0, 1280, 720);
+    view->setStyleSheet("background: transparent;"); // Fondo transparente
+    view->setRenderHint(QPainter::Antialiasing);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+    // Permitir que los eventos pasen a los botones y combos debajo
+    view->setAttribute(Qt::WA_TransparentForMouseEvents);
+    view->show();
+
+    inicializarCiudades();
+    dibujarGrafo();
+}
 
 

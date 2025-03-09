@@ -26,6 +26,8 @@ private slots:
     void agregarCiudad(const QString& nombre, int x, int y);
     void inicializarCiudades();
 
+    void on_actionCARGAR_triggered();
+
 private:
     Ui::MainWindow *ui;
     Grafo grafo;
