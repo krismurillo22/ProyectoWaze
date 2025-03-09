@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "grafo.h"
-
 #include <QGraphicsScene>
 #include <QGraphicsLineItem>
 #include <QGraphicsEllipseItem>
