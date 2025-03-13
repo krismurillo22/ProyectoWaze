@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>fondos/Ingresar.png</file>
         <file>fondos/main.png</file>
+        <file>fondos/bus.png</file>
+        <file>fondos/carro.png</file>
     </qresource>
 </RCC>

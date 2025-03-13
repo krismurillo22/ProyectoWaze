@@ -29,65 +29,57 @@ QVector<Arista> Grafo::obtenerAristas() const {
     return aristas;
 }
 
-QVector<int> Grafo::reconstruirRuta(QMap<int, int>& padres, int destino) {
-    QVector<int> ruta;
-    for (int at = destino; at != -1; at = padres[at]) {
-        ruta.prepend(at);
-    }
-    return ruta;
-}
+QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaTotal) const {
+    QMap<int, double> distancias;
+    QMap<int, int> previos;
+    QSet<int> nodosNoVisitados;
 
-// Algoritmo de Dijkstra
-QVector<int> Grafo::calcularRutaDijkstra(int origen, int destino) {
-    QMap<int, int> distancia;  // Almacena la distancia mínima a cada nodo
-    QMap<int, int> padres;
-    const int INF = std::numeric_limits<int>::max();
-
-    // Inicializar todas las distancias a infinito
-    for (const Nodo& nodo : obtenerNodos()) {
-        distancia[nodo.id] = INF;
-        padres[nodo.id] = -1;
+    for (const Nodo& nodo : nodos) {
+        distancias[nodo.id] = std::numeric_limits<double>::infinity();
+        previos[nodo.id] = -1;
+        nodosNoVisitados.insert(nodo.id);
     }
 
-    // Cola de prioridad (peso, nodo)
-    std::priority_queue<QPair<int, int>, QVector<QPair<int, int>>, std::greater<QPair<int, int>>> cola;
+    distancias[idNodoInicio] = 0;
 
-    // Distancia al nodo de origen es 0
-    distancia[origen] = 0;
-    cola.push(qMakePair(0, origen));
+    while (!nodosNoVisitados.isEmpty()) {
+        int nodoActual = -1;
+        double distanciaMinima = std::numeric_limits<double>::infinity();
 
-    while (!cola.empty()) {
-        int nodoActual = cola.top().second;
-        int costoActual = cola.top().first;
-        cola.pop();
+        for (int nodo : nodosNoVisitados) {
+            if (distancias[nodo] < distanciaMinima) {
+                nodoActual = nodo;
+                distanciaMinima = distancias[nodo];
+            }
+        }
 
-        // Si llegamos al destino, terminamos
-        if (nodoActual == destino) break;
+        if (nodoActual == -1 || nodoActual == idNodoFin) {
+            break;
+        }
 
-        // Procesar vecinos
-        for (const Arista& arista : obtenerAristas()) {
+        nodosNoVisitados.remove(nodoActual);
+
+        for (const Arista& arista : aristas) {
             if (arista.idNodoOrigen == nodoActual || arista.idNodoDestino == nodoActual) {
-                int vecino = (arista.idNodoOrigen == nodoActual) ? arista.idNodoDestino : arista.idNodoOrigen;
-                int nuevoCosto = costoActual + arista.peso;
+                int nodoVecino = (arista.idNodoOrigen == nodoActual) ? arista.idNodoDestino : arista.idNodoOrigen;
+                double distanciaAlternativa = distancias[nodoActual] + arista.peso;
 
-                if (nuevoCosto < distancia[vecino]) {
-                    distancia[vecino] = nuevoCosto;
-                    padres[vecino] = nodoActual;
-                    cola.push(qMakePair(nuevoCosto, vecino));
+                if (distanciaAlternativa < distancias[nodoVecino]) {
+                    distancias[nodoVecino] = distanciaAlternativa;
+                    previos[nodoVecino] = nodoActual;
                 }
             }
         }
     }
 
-    // Reconstruir ruta más corta
+    distanciaTotal = distancias[idNodoFin];
     QVector<int> ruta;
-    for (int at = destino; at != -1; at = padres[at]) {
-        ruta.prepend(at);
+    int nodoActual = idNodoFin;
+
+    while (nodoActual != -1) {
+        ruta.prepend(nodoActual);
+        nodoActual = previos[nodoActual];
     }
 
-    // Mostrar la ruta encontrada
-    qDebug() << "Ruta más corta de" << origen << "a" << destino << ":";
-    for (int nodo : ruta) {
-        qDebug() << nodo;
-    }
+    return ruta;
 }
