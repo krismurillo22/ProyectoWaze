@@ -4,5 +4,7 @@
         <file>fondos/main.png</file>
         <file>fondos/bus.png</file>
         <file>fondos/carro.png</file>
+        <file>fondos/mapaClaro.png</file>
+        <file>fondos/mapaOscuro.png</file>
     </qresource>
 </RCC>

@@ -4,6 +4,8 @@
 #include <QPoint>
 #include <QVector>
 #include <QString>
+#include <QFile>
+#include <QDataStream>
 
 struct Nodo {
     int id;
@@ -18,7 +20,6 @@ struct Arista {
     double peso;
 };
 
-// Implementación manual de un árbol AVL para almacenar los nodos
 class AVLTree {
 private:
     struct NodoAVL {
@@ -124,11 +125,15 @@ public:
 
 class Grafo {
 public:
+    Grafo();
+    ~Grafo();
     void agregarNodo(const QString& nombre, const QPoint& posicion);
     void agregarArista(int idNodoOrigen, int idNodoDestino, const QVector<QPoint>& puntosIntermedios);
     QVector<Nodo> obtenerNodos() const;
     QVector<Arista> obtenerAristas() const;
     QVector<int> dijkstra(int idNodoInicio, int idNodoFin, double& distanciaTotal) const;
+    void guardarEnArchivo(const QString& nombreArchivo) const ;
+    void cargarDesdeArchivo(const QString& nombreArchivo);
 
 private:
     AVLTree nodosAVL;

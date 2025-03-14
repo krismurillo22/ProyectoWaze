@@ -3,6 +3,13 @@
 #include <QSet>
 #include <limits>
 
+Grafo::Grafo() {
+    cargarDesdeArchivo("C:/Users/avril/Desktop/Proyectos/ProyectoWaze/archivos/grafo.gra");
+}
+
+Grafo::~Grafo() {
+    guardarEnArchivo("C:/Users/avril/Desktop/Proyectos/ProyectoWaze/archivos/grafo.gra");
+}
 void Grafo::agregarNodo(const QString& nombre, const QPoint& posicion) {
     int nuevoId = nodosAVL.obtenerTodos().size();
     nodosAVL.insertar({nuevoId, nombre, posicion});
@@ -77,4 +84,56 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     }
 
     return ruta;
+}
+
+void Grafo::guardarEnArchivo(const QString& nombreArchivo) const {
+    QFile archivo(nombreArchivo);
+    if (archivo.open(QIODevice::WriteOnly)) {
+        QDataStream out(&archivo);
+
+        // Guardar nodos
+        QVector<Nodo> nodos = nodosAVL.obtenerTodos();
+        out << nodos.size();
+        for (const Nodo& nodo : nodos) {
+            out << nodo.id << nodo.nombre << nodo.posicion;
+        }
+
+        // Guardar aristas
+        out << aristas.size();
+        for (const Arista& arista : aristas) {
+            out << arista.idNodoOrigen << arista.idNodoDestino << arista.puntosIntermedios << arista.peso;
+        }
+
+        archivo.close();
+    }
+}
+
+void Grafo::cargarDesdeArchivo(const QString& nombreArchivo) {
+    QFile archivo(nombreArchivo);
+    if (archivo.open(QIODevice::ReadOnly)) {
+        QDataStream in(&archivo);
+
+        // Limpiar estructuras actuales
+        aristas.clear();
+
+        // Cargar nodos
+        int cantidadNodos;
+        in >> cantidadNodos;
+        for (int i = 0; i < cantidadNodos; ++i) {
+            Nodo nodo;
+            in >> nodo.id >> nodo.nombre >> nodo.posicion;
+            nodosAVL.insertar(nodo);
+        }
+
+        // Cargar aristas
+        int cantidadAristas;
+        in >> cantidadAristas;
+        for (int i = 0; i < cantidadAristas; ++i) {
+            Arista arista;
+            in >> arista.idNodoOrigen >> arista.idNodoDestino >> arista.puntosIntermedios >> arista.peso;
+            aristas.append(arista);
+        }
+
+        archivo.close();
+    }
 }
