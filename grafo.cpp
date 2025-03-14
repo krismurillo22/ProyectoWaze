@@ -1,15 +1,11 @@
 #include "grafo.h"
-#include <QVector>
 #include <QMap>
 #include <QSet>
-#include <queue>
-#include <QPair>
-#include <QtMath>
-#include <QDebug>
+#include <limits>
 
 void Grafo::agregarNodo(const QString& nombre, const QPoint& posicion) {
-    int nuevoId = nodos.size();
-    nodos.append({nuevoId, nombre, posicion});
+    int nuevoId = nodosAVL.obtenerTodos().size();
+    nodosAVL.insertar({nuevoId, nombre, posicion});
 }
 
 void Grafo::agregarArista(int idNodoOrigen, int idNodoDestino, const QVector<QPoint>& puntosIntermedios) {
@@ -22,7 +18,7 @@ void Grafo::agregarArista(int idNodoOrigen, int idNodoDestino, const QVector<QPo
 }
 
 QVector<Nodo> Grafo::obtenerNodos() const {
-    return nodos;
+    return nodosAVL.obtenerTodos();
 }
 
 QVector<Arista> Grafo::obtenerAristas() const {
@@ -34,7 +30,7 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     QMap<int, int> previos;
     QSet<int> nodosNoVisitados;
 
-    for (const Nodo& nodo : nodos) {
+    for (const Nodo& nodo : obtenerNodos()) {
         distancias[nodo.id] = std::numeric_limits<double>::infinity();
         previos[nodo.id] = -1;
         nodosNoVisitados.insert(nodo.id);
@@ -75,7 +71,6 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     distanciaTotal = distancias[idNodoFin];
     QVector<int> ruta;
     int nodoActual = idNodoFin;
-
     while (nodoActual != -1) {
         ruta.prepend(nodoActual);
         nodoActual = previos[nodoActual];
