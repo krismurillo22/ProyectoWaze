@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QGraphicsOpacityEffect>
+#include <QColorDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::moverCarro);
+    colorDefecto = QColor(245, 3, 144);
 }
 
 MainWindow::~MainWindow()
@@ -34,11 +36,11 @@ void MainWindow::on_pushButton_clicked()
     ui->stackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::dibujarGrafo(const QVector<int>& rutaMasCorta) {
+void MainWindow::dibujarGrafo(QColor colorRuta, const QVector<int>& rutaMasCorta) {
     const QVector<Nodo>& nodos = grafo.obtenerNodos();
     const QVector<Arista>& aristas = grafo.obtenerAristas();
     for (const Nodo& nodo : nodos) {
-        QColor colorNodo = (rutaMasCorta.contains(nodo.id)) ? Qt::blue : QColor(245, 3, 144);
+        QColor colorNodo = (rutaMasCorta.contains(nodo.id)) ? colorRuta : colorDefecto;
         scene->addEllipse(nodo.posicion.x(), nodo.posicion.y(), 8, 8,
                           QPen(Qt::NoPen), QBrush(colorNodo));
     }
@@ -64,7 +66,7 @@ void MainWindow::dibujarGrafo(const QVector<int>& rutaMasCorta) {
             }
         }
 
-        QColor colorArista = (esAristaMasCorta) ? Qt::blue : QColor(245, 3, 144);
+        QColor colorArista = (esAristaMasCorta) ? colorRuta : colorDefecto;
         scene->addPath(path, QPen(colorArista, 3));
     }
 }
@@ -84,10 +86,10 @@ void MainWindow::on_actionCARGAR_triggered()
 
     // En el constructor
     scene = new QGraphicsScene(this);
-    scene->setSceneRect(0, 0, 1280, 720); // Ajustar la escena al tamaño del mapa
+    scene->setSceneRect(0, 0, 1280, 720);
     QGraphicsView *view = new QGraphicsView(scene, mapaWidget);
     view->setGeometry(0, 0, 1280, 720);
-    view->setStyleSheet("background: transparent;"); // Fondo transparente
+    view->setStyleSheet("background: transparent;");
     view->setRenderHint(QPainter::Antialiasing);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -133,6 +135,8 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
+    historial.append(qMakePair(nombreOrigen, nombreDestino));
+
     double distanciaTotal = 0;
     QVector<int> rutaMasCorta = grafo.dijkstra(idOrigen, idDestino, distanciaTotal);
     double distanciaReal = convertirAPesoReal(distanciaTotal);
@@ -142,7 +146,7 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
-    const double velocidadPromedio = 80.0; // km/h
+    const double velocidadPromedio = 50.0; // km/h
     const double rendimientoCombustible = 12.0; // km/L
 
     double tiempoHoras = distanciaReal / velocidadPromedio;
@@ -160,7 +164,7 @@ void MainWindow::on_pushButton_3_clicked()
     ui->combustible->setText(QString::number(consumoLitros, 'f', 2) + " L.");
 
     scene->clear();
-    dibujarGrafo(rutaMasCorta);
+    dibujarGrafo(Qt::yellow, rutaMasCorta);
 
 }
 
@@ -265,4 +269,59 @@ void MainWindow::on_recorrido_clicked() {
     timer->start(1000 / velocidad);
 }
 
+
+
+void MainWindow::on_actionModo_Claro_triggered()
+{
+    QPixmap fondo(":/fondos/mapaClaro.png");
+    if (ui->label_2->hasScaledContents()) {
+        fondo = fondo.scaled(ui->label_2->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    ui->label_2->setPixmap(fondo);
+    QString estiloLabel = "color: black; font: 87 14pt 'Segoe UI';";
+    ui->combustible->setStyleSheet(estiloLabel);
+    ui->distancia->setStyleSheet(estiloLabel);
+    ui->paradas->setStyleSheet(estiloLabel);
+    ui->tiempo->setStyleSheet(estiloLabel);
+}
+
+
+void MainWindow::on_actionModo_Oscuro_2_triggered()
+{
+    QPixmap fondo(":/fondos/mapaOscuro.png");
+    if (ui->label_2->hasScaledContents()) {
+        fondo = fondo.scaled(ui->label_2->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    ui->label_2->setPixmap(fondo);
+    QString estiloLabel = "color: white; font: 87 14pt 'Segoe UI';";
+    ui->combustible->setStyleSheet(estiloLabel);
+    ui->distancia->setStyleSheet(estiloLabel);
+    ui->paradas->setStyleSheet(estiloLabel);
+    ui->tiempo->setStyleSheet(estiloLabel);
+}
+
+
+void MainWindow::on_actionCAMBIAR_COLOR_A_LAS_RUTAS_triggered()
+{
+    QColor nuevoColor = QColorDialog::getColor(QColor(245, 3, 144), this, "Selecciona un color para las rutas");
+    if (nuevoColor.isValid()) {
+        colorDefecto = nuevoColor;
+        dibujarGrafo();
+    }
+}
+
+void MainWindow::on_actionVer_Historial_triggered()
+{
+    if (historial.isEmpty()) {
+        QMessageBox::information(this, "Historial", "No hay rutas guardadas.");
+        return;
+    }
+
+    QString historialTexto;
+    for (const QPair<QString, QString>& ruta : historial) {
+        historialTexto += "Origen: " + ruta.first + " -> Destino: " + ruta.second + "\n";
+    }
+
+    QMessageBox::information(this, "Historial de Rutas", historialTexto);
+}
 

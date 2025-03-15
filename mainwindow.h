@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void dibujarGrafo(const QVector<int>& rutaMasCorta = QVector<int>());
+    void dibujarGrafo(QColor colorRuta = Qt::yellow, const QVector<int>& rutaMasCorta = QVector<int>());
     double convertirAPesoReal(int peso);
     void moverCarro();
 
@@ -38,6 +38,14 @@ private slots:
 
     void on_recorrido_clicked();
 
+    void on_actionModo_Claro_triggered();
+
+    void on_actionModo_Oscuro_2_triggered();
+
+    void on_actionCAMBIAR_COLOR_A_LAS_RUTAS_triggered();
+
+    void on_actionVer_Historial_triggered();
+
 private:
     Ui::MainWindow *ui;
     Grafo grafo;
@@ -48,6 +56,8 @@ private:
     QVector<QPoint> rutaCarro;
     int indiceRuta;
     int velocidad;
+    QColor colorDefecto;
+    QVector<QPair<QString, QString>> historial;
 
 };
 #endif // MAINWINDOW_H

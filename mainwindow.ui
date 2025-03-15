@@ -333,15 +333,16 @@ color: rgb(0, 64, 143);</string>
     <property name="title">
      <string>Configuracion</string>
     </property>
-    <widget class="QMenu" name="menuCambiar_apariencia">
+    <widget class="QMenu" name="menuCambiar_apariencia_2">
      <property name="title">
       <string>Cambiar apariencia</string>
      </property>
-     <addaction name="actionModo_Oscuro"/>
+     <addaction name="actionModo_Oscuro_2"/>
+     <addaction name="actionModo_Claro"/>
     </widget>
-    <addaction name="menuCambiar_apariencia"/>
     <addaction name="actionCAMBIAR_COLOR_A_LAS_RUTAS"/>
     <addaction name="actionPRIORIZAR_RUTAS_CORTAS"/>
+    <addaction name="menuCambiar_apariencia_2"/>
    </widget>
    <widget class="QMenu" name="menuAYUDA">
     <property name="title">
@@ -353,6 +354,7 @@ color: rgb(0, 64, 143);</string>
     <property name="title">
      <string>Historial</string>
     </property>
+    <addaction name="actionVer_Historial"/>
    </widget>
    <addaction name="menuCARGAR"/>
    <addaction name="menuCONFIGURACION"/>
@@ -380,9 +382,19 @@ color: rgb(0, 64, 143);</string>
     <string>Guia</string>
    </property>
   </action>
-  <action name="actionModo_Oscuro">
+  <action name="actionModo_Oscuro_2">
    <property name="text">
     <string>Modo Oscuro</string>
+   </property>
+  </action>
+  <action name="actionModo_Claro">
+   <property name="text">
+    <string>Modo Claro</string>
+   </property>
+  </action>
+  <action name="actionVer_Historial">
+   <property name="text">
+    <string>Ver Historial</string>
    </property>
   </action>
  </widget>
