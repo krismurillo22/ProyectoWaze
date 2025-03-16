@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void dibujarGrafo(QColor colorRuta = Qt::yellow, const QVector<int>& rutaMasCorta = QVector<int>());
+    void dibujarGrafo(const QVector<int>& rutaMasCorta = QVector<int>());
     double convertirAPesoReal(int peso);
     void moverCarro();
 
@@ -57,6 +57,7 @@ private:
     int indiceRuta;
     int velocidad;
     QColor colorDefecto;
+    QColor colorRuta;
     QVector<QPair<QString, QString>> historial;
 
 };

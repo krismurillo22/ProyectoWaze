@@ -86,6 +86,7 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     return ruta;
 }
 
+
 void Grafo::guardarEnArchivo(const QString& nombreArchivo) const {
     QFile archivo(nombreArchivo);
     if (archivo.open(QIODevice::WriteOnly)) {

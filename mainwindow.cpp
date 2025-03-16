@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QGraphicsOpacityEffect>
 #include <QColorDialog>
+#include <QInputDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::moverCarro);
     colorDefecto = QColor(245, 3, 144);
+    colorRuta = Qt::yellow;
+    ui->textParadas->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -36,7 +39,7 @@ void MainWindow::on_pushButton_clicked()
     ui->stackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::dibujarGrafo(QColor colorRuta, const QVector<int>& rutaMasCorta) {
+void MainWindow::dibujarGrafo(const QVector<int>& rutaMasCorta) {
     const QVector<Nodo>& nodos = grafo.obtenerNodos();
     const QVector<Arista>& aristas = grafo.obtenerAristas();
     for (const Nodo& nodo : nodos) {
@@ -113,8 +116,6 @@ void MainWindow::on_actionCARGAR_triggered()
     }
 }
 
-
-
 void MainWindow::on_pushButton_3_clicked()
 {
     int idOrigen = ui->comboBoxOrigen->currentIndex();
@@ -146,26 +147,40 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
-    const double velocidadPromedio = 50.0; // km/h
+    const double velocidadPromedio = 60.0; // km/h
     const double rendimientoCombustible = 12.0; // km/L
 
     double tiempoHoras = distanciaReal / velocidadPromedio;
-    QString tiempoStr;
-    if (tiempoHoras < 1.0) {
-        int minutos = static_cast<int>(tiempoHoras * 60);
-        tiempoStr = QString::number(minutos) + " minutos";
+
+    // Verificamos si es transporte público
+    if (ui->comboBoxTipoTransporte->currentText() == "Transporte Público") {
+        int paradas = rutaMasCorta.size() - 2; // Restamos origen y destino
+        tiempoHoras += paradas;
+        ui->paradas->setText(QString::number(paradas) + (paradas == 1 ? " Parada" : " Paradas"));
+        ui->textParadas->setVisible(true);
     } else {
-        tiempoStr = QString::number(tiempoHoras, 'f', 2) + " horas";
+        ui->paradas->setText("0 Paradas");
+        ui->textParadas->setVisible(false);
+    }
+
+    int horas = static_cast<int>(tiempoHoras);
+    int minutos = static_cast<int>((tiempoHoras - horas) * 60);
+
+    QString tiempoStr;
+    if (horas == 0) {
+        tiempoStr = QString::number(minutos) + " min";
+    } else if (minutos == 0) {
+        tiempoStr = QString::number(horas) + " h";
+    } else {
+        tiempoStr = QString::number(horas) + " h " + QString::number(minutos) + " min";
     }
 
     double consumoLitros = distanciaReal / rendimientoCombustible;
     ui->distancia->setText(QString::number(distanciaReal) + " KM.");
     ui->tiempo->setText(tiempoStr);
     ui->combustible->setText(QString::number(consumoLitros, 'f', 2) + " L.");
-
     scene->clear();
-    dibujarGrafo(Qt::yellow, rutaMasCorta);
-
+    dibujarGrafo(rutaMasCorta);
 }
 
 void MainWindow::on_restablecer_clicked()
@@ -234,8 +249,14 @@ void MainWindow::on_recorrido_clicked() {
             if ((arista.idNodoOrigen == nodoActual && arista.idNodoDestino == nodoSiguiente) ||
                 (arista.idNodoOrigen == nodoSiguiente && arista.idNodoDestino == nodoActual)) {
 
-                for (const QPoint& punto : arista.puntosIntermedios) {
-                    rutaCarro.append(punto + QPoint(4, 4));
+                if (arista.idNodoOrigen == nodoActual && arista.idNodoDestino == nodoSiguiente) {
+                    for (const QPoint& punto : arista.puntosIntermedios) {
+                        rutaCarro.append(punto + QPoint(4, 4));
+                    }
+                } else {
+                    for (int j = arista.puntosIntermedios.size() - 1; j >= 0; --j) {
+                        rutaCarro.append(arista.puntosIntermedios[j] + QPoint(4, 4));
+                    }
                 }
                 break;
             }
@@ -244,23 +265,32 @@ void MainWindow::on_recorrido_clicked() {
 
     rutaCarro.append(nodos[rutaMasCorta.last()].posicion + QPoint(4, 4));
 
-    // Si ya existía un carro, eliminarlo antes de crear uno nuevo
+    // Si ya existía un vehículo, eliminarlo antes de crear uno nuevo
     if (carroItem) {
         scene->removeItem(carroItem);
         delete carroItem;
         carroItem = nullptr;
     }
 
-    QPixmap carroPixmap(":/fondos/carro.png");
-    if (carroPixmap.isNull()) {
-        QMessageBox::warning(this, "Error", "No se pudo cargar la imagen del carro.");
+    // Seleccionar el tipo de vehículo según el transporte elegido
+    QString tipoTransporte = ui->comboBoxTipoTransporte->currentText();
+    QPixmap vehiculoPixmap;
+
+    if (tipoTransporte == "Transporte Público") {
+        vehiculoPixmap.load(":/fondos/bus.png");
+    } else {
+        vehiculoPixmap.load(":/fondos/carro.png");
+    }
+
+    if (vehiculoPixmap.isNull()) {
+        QMessageBox::warning(this, "Error", "No se pudo cargar la imagen del vehículo.");
         return;
     }
 
-    carroPixmap = carroPixmap.scaled(30, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    carroItem = new QGraphicsPixmapItem(carroPixmap);
+    vehiculoPixmap = vehiculoPixmap.scaled(40, 25, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    carroItem = new QGraphicsPixmapItem(vehiculoPixmap);
     scene->addItem(carroItem);
-    carroItem->setOffset(-carroPixmap.width() / 2, -carroPixmap.height() / 2);
+    carroItem->setOffset(-vehiculoPixmap.width() / 2, -vehiculoPixmap.height() / 2);
 
     // Iniciar el recorrido
     indiceRuta = 0;
@@ -268,9 +298,6 @@ void MainWindow::on_recorrido_clicked() {
     velocidad = ui->comboBoxVelocidad->currentIndex() + 1;
     timer->start(1000 / velocidad);
 }
-
-
-
 void MainWindow::on_actionModo_Claro_triggered()
 {
     QPixmap fondo(":/fondos/mapaClaro.png");
@@ -303,9 +330,21 @@ void MainWindow::on_actionModo_Oscuro_2_triggered()
 
 void MainWindow::on_actionCAMBIAR_COLOR_A_LAS_RUTAS_triggered()
 {
-    QColor nuevoColor = QColorDialog::getColor(QColor(245, 3, 144), this, "Selecciona un color para las rutas");
+    QStringList opciones = {"Rutas en general", "Ruta calculada"};
+    bool ok;
+
+    QString seleccion = QInputDialog::getItem(this, "Seleccionar Color", "¿Qué color deseas modificar?", opciones, 0, false, &ok);
+
+    if (!ok) return; // Si el usuario cancela, no hace nada
+
+    QColor nuevoColor = QColorDialog::getColor(QColor(245, 3, 144), this, "Selecciona un color");
+
     if (nuevoColor.isValid()) {
-        colorDefecto = nuevoColor;
+        if (seleccion == "Rutas en general") {
+            colorDefecto = nuevoColor;
+        } else {
+            colorRuta = nuevoColor; // Agrega una variable para este color
+        }
         dibujarGrafo();
     }
 }
