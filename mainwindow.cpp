@@ -399,3 +399,18 @@ void MainWindow::on_regresar_clicked()
     ui->stackedWidget->setCurrentIndex(1);
 }
 
+void MainWindow::on_anterior_clicked()
+{
+    if (indiceImagen > 0) {
+        indiceImagen--;  // Disminuir el índice para mostrar la imagen anterior
+        ui->labelImagen->setPixmap(QPixmap(listaImagenes[indiceImagen]));  // Cambiar la imagen del QLabel
+    }
+}
+
+void MainWindow::on_siguiente_clicked()
+{
+    if (indiceImagen < 3) {
+        indiceImagen++;  // Aumentar el índice para mostrar la siguiente imagen
+        ui->labelImagen->setPixmap(QPixmap(listaImagenes[indiceImagen]));  // Cambiar la imagen del QLabel
+    }
+}

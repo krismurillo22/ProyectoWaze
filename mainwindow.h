@@ -50,6 +50,10 @@ private slots:
 
     void on_regresar_clicked();
 
+    void on_anterior_clicked();
+
+    void on_siguiente_clicked();
+
 private:
     Ui::MainWindow *ui;
     Grafo grafo;
@@ -63,6 +67,8 @@ private:
     QColor colorDefecto;
     QColor colorRuta;
     QVector<QPair<QString, QString>> historial;
-
+    int indiceImagen = 0;
+    QString listaImagenes[4] = {":/fondos/guia1.png", ":/fondos/guia2.png", ":/fondos/guia3.png", ":/fondos/guia4.png"};
 };
+
 #endif // MAINWINDOW_H
