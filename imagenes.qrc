@@ -6,5 +6,9 @@
         <file>fondos/carro.png</file>
         <file>fondos/mapaClaro.png</file>
         <file>fondos/mapaOscuro.png</file>
+        <file>fondos/guia1.png</file>
+        <file>fondos/guia2.png</file>
+        <file>fondos/guia3.png</file>
+        <file>fondos/guia4.png</file>
     </qresource>
 </RCC>

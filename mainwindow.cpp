@@ -118,6 +118,7 @@ void MainWindow::on_actionCARGAR_triggered()
 
 void MainWindow::on_pushButton_3_clicked()
 {
+    ui->textParadas->clear();
     int idOrigen = ui->comboBoxOrigen->currentIndex();
     int idDestino = ui->comboBoxDestino->currentIndex();
 
@@ -213,6 +214,27 @@ void MainWindow::moverCarro() {
     if (indiceRuta < rutaCarro.size() - 1) {
         indiceRuta++;
         carroItem->setPos(rutaCarro[indiceRuta]);
+
+        // Verificar si el vehículo pasa por una ciudad intermedia
+        QString tipoTransporte = ui->comboBoxTipoTransporte->currentText();
+        if (tipoTransporte == "Transporte Público") {
+            // Verificar si el vehículo pasa por una ciudad intermedia
+            const QVector<Nodo>& nodos = grafo.obtenerNodos();
+            for (const Nodo& nodo : nodos) {
+                if (carroItem->pos() == nodo.posicion + QPoint(4, 4)) {
+                    // Si el nodo no es el origen ni el destino, registrar la parada y hacer una pausa
+                    if (nodo.id != ui->comboBoxOrigen->currentIndex() && nodo.id != ui->comboBoxDestino->currentIndex()) {
+                        ui->textParadas->append("Se realizó una parada en " + nodo.nombre);
+
+                        // Detener el movimiento por 1 segundo
+                        timer->stop();
+                        QTimer::singleShot(1000, this, [this]() {
+                            timer->start(1000 / velocidad);
+                        });
+                    }
+                }
+            }
+        }
     } else {
         timer->stop();
         QMessageBox::information(this, "Recorrido Completado", "El carro ha llegado a su destino.");
@@ -227,6 +249,7 @@ void MainWindow::moverCarro() {
 }
 
 void MainWindow::on_recorrido_clicked() {
+    ui->textParadas->clear();
     double distanciaTotal = 0;
     QVector<int> rutaMasCorta = grafo.dijkstra(ui->comboBoxOrigen->currentIndex(), ui->comboBoxDestino->currentIndex(), distanciaTotal);
 
@@ -298,6 +321,7 @@ void MainWindow::on_recorrido_clicked() {
     velocidad = ui->comboBoxVelocidad->currentIndex() + 1;
     timer->start(1000 / velocidad);
 }
+
 void MainWindow::on_actionModo_Claro_triggered()
 {
     QPixmap fondo(":/fondos/mapaClaro.png");
@@ -362,5 +386,16 @@ void MainWindow::on_actionVer_Historial_triggered()
     }
 
     QMessageBox::information(this, "Historial de Rutas", historialTexto);
+}
+
+
+void MainWindow::on_actionGUIA_triggered()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+void MainWindow::on_regresar_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(1);
 }
 

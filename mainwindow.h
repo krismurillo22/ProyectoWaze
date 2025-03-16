@@ -46,6 +46,10 @@ private slots:
 
     void on_actionVer_Historial_triggered();
 
+    void on_actionGUIA_triggered();
+
+    void on_regresar_clicked();
+
 private:
     Ui::MainWindow *ui;
     Grafo grafo;
