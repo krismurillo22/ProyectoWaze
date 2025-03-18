@@ -13,6 +13,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QColorDialog>
 #include <QInputDialog>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -148,6 +149,65 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
+    rutaElegida = rutaMasCorta;
+
+    // Llamar a la función que actualiza los labels
+    actualizarLabels(distanciaReal, rutaMasCorta);
+
+    scene->clear();
+    dibujarGrafo(rutaMasCorta);
+
+    QVector<QVector<int>> rutasAlternativas = grafo.obtenerTodasLasRutas(idOrigen, idDestino);
+
+    // Limpiar el contenido anterior del scroll
+    QWidget* scrollWidget = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(scrollWidget);
+
+    // Agregar botones para cada ruta alternativa
+    for (int i = 0; i < rutasAlternativas.size(); ++i) {
+        // Calcular la distancia total para cada ruta usando Dijkstra
+        double distanciaRutaTotal = 0;
+        for (int j = 0; j < rutasAlternativas[i].size() - 1; ++j) {
+            // Obtener la distancia total de la ruta utilizando Dijkstra
+            double distanciaRuta = 0;
+            QVector<int> rutaAlternativa = grafo.dijkstra(rutasAlternativas[i][j], rutasAlternativas[i][j + 1], distanciaRuta);
+            distanciaRutaTotal += convertirAPesoReal(distanciaRuta);
+        }
+
+        // Calcular el tiempo para esa ruta
+        double tiempoRutaHoras = distanciaRutaTotal / 60.0; // Velocidad promedio = 60 km/h
+        int tiempoHorasRuta = static_cast<int>(tiempoRutaHoras);
+        int tiempoMinutosRuta = static_cast<int>((tiempoRutaHoras - tiempoHorasRuta) * 60);
+
+        QString tiempoRutaStr;
+        if (tiempoHorasRuta == 0) {
+            tiempoRutaStr = QString::number(tiempoMinutosRuta) + " min";
+        } else if (tiempoMinutosRuta == 0) {
+            tiempoRutaStr = QString::number(tiempoHorasRuta) + " h";
+        } else {
+            tiempoRutaStr = QString::number(tiempoHorasRuta) + " h " + QString::number(tiempoMinutosRuta) + " min";
+        }
+
+        QPushButton* botonRuta = new QPushButton(tiempoRutaStr, this);
+        connect(botonRuta, &QPushButton::clicked, this, [this, rutasAlternativas, i, distanciaRutaTotal]() {
+            // Al hacer clic en el botón, actualizamos los labels con los nuevos valores de la ruta seleccionada
+            rutaElegida = rutasAlternativas[i];
+            scene->clear();
+            dibujarGrafo(rutasAlternativas[i]);
+
+            // Actualizamos los labels con la nueva distancia y tiempo
+            actualizarLabels(distanciaRutaTotal, rutasAlternativas[i]);
+        });
+
+        layout->addWidget(botonRuta); // Agregar el botón al layout
+    }
+    // Asignar el QWidget con el layout al QScrollArea
+    ui->scrollArea->setWidget(scrollWidget);  // Aquí usamos un QScrollArea para mostrar los botones
+    ui->scrollArea->setWidgetResizable(true);
+}
+
+void MainWindow::actualizarLabels(double distanciaReal, const QVector<int>& ruta)
+{
     const double velocidadPromedio = 60.0; // km/h
     const double rendimientoCombustible = 12.0; // km/L
 
@@ -155,7 +215,7 @@ void MainWindow::on_pushButton_3_clicked()
 
     // Verificamos si es transporte público
     if (ui->comboBoxTipoTransporte->currentText() == "Transporte Público") {
-        int paradas = rutaMasCorta.size() - 2; // Restamos origen y destino
+        int paradas = ruta.size() - 2; // Restamos origen y destino
         tiempoHoras += paradas;
         ui->paradas->setText(QString::number(paradas) + (paradas == 1 ? " Parada" : " Paradas"));
         ui->textParadas->setVisible(true);
@@ -180,8 +240,6 @@ void MainWindow::on_pushButton_3_clicked()
     ui->distancia->setText(QString::number(distanciaReal) + " KM.");
     ui->tiempo->setText(tiempoStr);
     ui->combustible->setText(QString::number(consumoLitros, 'f', 2) + " L.");
-    scene->clear();
-    dibujarGrafo(rutaMasCorta);
 }
 
 void MainWindow::on_restablecer_clicked()
@@ -201,7 +259,6 @@ void MainWindow::on_restablecer_clicked()
     ui->distancia->setText("0 KM.");
     ui->paradas->setText("0 Paradas");
     ui->tiempo->setText("0 horas");
-    ui->textAlternas->clear();
 
 }
 
@@ -250,11 +307,11 @@ void MainWindow::moverCarro() {
 
 void MainWindow::on_recorrido_clicked() {
     ui->textParadas->clear();
-    double distanciaTotal = 0;
-    QVector<int> rutaMasCorta = grafo.dijkstra(ui->comboBoxOrigen->currentIndex(), ui->comboBoxDestino->currentIndex(), distanciaTotal);
+    // Usamos la ruta seleccionada en lugar de la ruta más corta calculada por Dijkstra
+    QVector<int> rutaSeleccionadaLocal = rutaElegida;
 
-    if (rutaMasCorta.isEmpty()) {
-        QMessageBox::warning(this, "Error", "No hay una ruta disponible.");
+    if (rutaSeleccionadaLocal.isEmpty()) {
+        QMessageBox::warning(this, "Error", "No se ha seleccionado una ruta.");
         return;
     }
 
@@ -262,9 +319,10 @@ void MainWindow::on_recorrido_clicked() {
     const QVector<Nodo>& nodos = grafo.obtenerNodos();
     const QVector<Arista>& aristas = grafo.obtenerAristas();
 
-    for (int i = 0; i < rutaMasCorta.size() - 1; ++i) {
-        int nodoActual = rutaMasCorta[i];
-        int nodoSiguiente = rutaMasCorta[i + 1];
+    // Usamos la ruta seleccionada en lugar de la ruta más corta
+    for (int i = 0; i < rutaSeleccionadaLocal.size() - 1; ++i) {
+        int nodoActual = rutaSeleccionadaLocal[i];
+        int nodoSiguiente = rutaSeleccionadaLocal[i + 1];
 
         rutaCarro.append(nodos[nodoActual].posicion + QPoint(4, 4));
 
@@ -286,7 +344,7 @@ void MainWindow::on_recorrido_clicked() {
         }
     }
 
-    rutaCarro.append(nodos[rutaMasCorta.last()].posicion + QPoint(4, 4));
+    rutaCarro.append(nodos[rutaSeleccionadaLocal.last()].posicion + QPoint(4, 4));
 
     // Si ya existía un vehículo, eliminarlo antes de crear uno nuevo
     if (carroItem) {
@@ -321,6 +379,7 @@ void MainWindow::on_recorrido_clicked() {
     velocidad = ui->comboBoxVelocidad->currentIndex() + 1;
     timer->start(1000 / velocidad);
 }
+
 
 void MainWindow::on_actionModo_Claro_triggered()
 {

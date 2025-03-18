@@ -134,10 +134,12 @@ public:
     QVector<int> dijkstra(int idNodoInicio, int idNodoFin, double& distanciaTotal) const;
     void guardarEnArchivo(const QString& nombreArchivo) const ;
     void cargarDesdeArchivo(const QString& nombreArchivo);
+    QVector<QVector<int>> obtenerTodasLasRutas(int idNodoInicio, int idNodoFin) const;
 
 private:
     AVLTree nodosAVL;
     QVector<Arista> aristas;
+    void todasLasRutas(int idNodoInicio, int idNodoFin, QVector<QVector<int>>& rutas, QVector<int> rutaActual, QSet<int> nodosVisitados) const;
 };
 
 #endif // GRAFO_H

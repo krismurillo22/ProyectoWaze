@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -181,23 +181,6 @@ background-color: rgb(255, 255, 255);</string>
        <string>CALCULAR RUTA</string>
       </property>
      </widget>
-     <widget class="QPlainTextEdit" name="textAlternas">
-      <property name="geometry">
-       <rect>
-        <x>1080</x>
-        <y>540</y>
-        <width>181</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(0, 0, 0);
-font: 10pt &quot;Segoe UI&quot;;</string>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="distancia">
       <property name="geometry">
        <rect>
@@ -332,6 +315,29 @@ color: rgb(255, 255, 255);</string>
       <property name="readOnly">
        <bool>true</bool>
       </property>
+     </widget>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="geometry">
+       <rect>
+        <x>1080</x>
+        <y>540</y>
+        <width>181</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>179</width>
+         <height>159</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_3">

@@ -23,6 +23,7 @@ public:
     void dibujarGrafo(const QVector<int>& rutaMasCorta = QVector<int>());
     double convertirAPesoReal(int peso);
     void moverCarro();
+    void actualizarLabels(double distanciaReal, const QVector<int>& ruta);
 
 private slots:
     void on_pushButton_clicked();
@@ -69,6 +70,8 @@ private:
     QVector<QPair<QString, QString>> historial;
     int indiceImagen = 0;
     QString listaImagenes[4] = {":/fondos/guia1.png", ":/fondos/guia2.png", ":/fondos/guia3.png", ":/fondos/guia4.png"};
+    QVector<QVector<int>> rutasEncontradas;
+    QVector<int> rutaElegida;
 };
 
 #endif // MAINWINDOW_H

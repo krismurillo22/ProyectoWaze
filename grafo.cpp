@@ -86,6 +86,30 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     return ruta;
 }
 
+void Grafo::todasLasRutas(int idNodoInicio, int idNodoFin, QVector<QVector<int>>& rutas, QVector<int> rutaActual, QSet<int> nodosVisitados) const {
+    rutaActual.append(idNodoInicio);
+    nodosVisitados.insert(idNodoInicio);
+
+    if (idNodoInicio == idNodoFin) {
+        rutas.append(rutaActual);
+    } else {
+        for (const Arista& arista : aristas) {
+            int vecino = (arista.idNodoOrigen == idNodoInicio) ? arista.idNodoDestino :
+                         (arista.idNodoDestino == idNodoInicio) ? arista.idNodoOrigen : -1;
+
+            if (vecino != -1 && !nodosVisitados.contains(vecino)) {
+                todasLasRutas(vecino, idNodoFin, rutas, rutaActual, nodosVisitados);
+            }
+        }
+    }
+}
+
+QVector<QVector<int>> Grafo::obtenerTodasLasRutas(int idNodoInicio, int idNodoFin) const {
+    QVector<QVector<int>> rutas;
+    todasLasRutas(idNodoInicio, idNodoFin, rutas, {}, {});
+    return rutas;
+}
+
 
 void Grafo::guardarEnArchivo(const QString& nombreArchivo) const {
     QFile archivo(nombreArchivo);
