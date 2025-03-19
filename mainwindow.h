@@ -8,6 +8,7 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsPixmapItem>
 #include <QTimer>
+#include "arbolhistorial.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,7 @@ public:
     double convertirAPesoReal(int peso);
     void moverCarro();
     void actualizarLabels(double distanciaReal, const QVector<int>& ruta);
+    QVector<int> seleccionarParadas(int idOrigen, int idDestino, const QVector<int>& rutaMasCorta);
 
 private slots:
     void on_pushButton_clicked();
@@ -67,11 +69,12 @@ private:
     int velocidad;
     QColor colorDefecto;
     QColor colorRuta;
-    QVector<QPair<QString, QString>> historial;
     int indiceImagen = 0;
     QString listaImagenes[4] = {":/fondos/guia1.png", ":/fondos/guia2.png", ":/fondos/guia3.png", ":/fondos/guia4.png"};
     QVector<QVector<int>> rutasEncontradas;
     QVector<int> rutaElegida;
+    ArbolHistorial arbolHistorial;
+    QVector<QPair<QString, QString>> historial;
 };
 
 #endif // MAINWINDOW_H

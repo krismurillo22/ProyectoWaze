@@ -460,7 +460,6 @@ font: 87 18pt &quot;Segoe UI Black&quot;;</string>
      <addaction name="actionModo_Claro"/>
     </widget>
     <addaction name="actionCAMBIAR_COLOR_A_LAS_RUTAS"/>
-    <addaction name="actionPRIORIZAR_RUTAS_CORTAS"/>
     <addaction name="menuCambiar_apariencia_2"/>
    </widget>
    <widget class="QMenu" name="menuAYUDA">

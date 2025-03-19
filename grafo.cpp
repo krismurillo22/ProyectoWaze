@@ -32,6 +32,10 @@ QVector<Arista> Grafo::obtenerAristas() const {
     return aristas;
 }
 
+void Grafo::actualizarHistorial(const QString& ruta) const{
+    historialRutas.insertar(ruta);  // Llamas a la función insertar que ahora no es const
+}
+
 QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaTotal) const {
     QMap<int, double> distancias;
     QMap<int, int> previos;
@@ -86,6 +90,16 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     return ruta;
 }
 
+QString Grafo::obtenerNombreNodo(int id) const {
+    QVector<Nodo> nodos = obtenerNodos();
+    for (const Nodo& nodo : nodos) {
+        if (nodo.id == id) {
+            return nodo.nombre;
+        }
+    }
+    return "Desconocido"; // En caso de que no lo encuentre
+}
+
 void Grafo::todasLasRutas(int idNodoInicio, int idNodoFin, QVector<QVector<int>>& rutas, QVector<int> rutaActual, QSet<int> nodosVisitados) const {
     rutaActual.append(idNodoInicio);
     nodosVisitados.insert(idNodoInicio);
@@ -110,6 +124,47 @@ QVector<QVector<int>> Grafo::obtenerTodasLasRutas(int idNodoInicio, int idNodoFi
     return rutas;
 }
 
+QSet<int> Grafo::obtenerCiudadesEntre(int idNodoInicio, int idNodoFin) const {
+    QVector<QVector<int>> rutas = obtenerTodasLasRutas(idNodoInicio, idNodoFin);
+    QSet<int> ciudadesIntermedias;
+
+    for (const QVector<int>& ruta : rutas) {
+        for (int ciudad : ruta) {
+            if (ciudad != idNodoInicio && ciudad != idNodoFin) {
+                ciudadesIntermedias.insert(ciudad);
+            }
+        }
+    }
+
+    return ciudadesIntermedias;
+}
+
+QVector<int> Grafo::calcularRutaConParadas(const QVector<int>& paradas, double& distanciaTotal) const {
+    if (paradas.isEmpty()) return {};
+
+    QVector<int> rutaFinal;
+    distanciaTotal = 0;
+
+    int nodoActual = paradas.first();
+    for (int i = 1; i < paradas.size(); ++i) {
+        double distanciaParcial = 0;
+        QVector<int> subRuta = dijkstra(nodoActual, paradas[i], distanciaParcial);
+
+        if (subRuta.isEmpty()) {
+            return {}; // Si alguna ruta entre paradas no es posible, devolvemos vacío.
+        }
+
+        if (!rutaFinal.isEmpty()) {
+            subRuta.pop_front(); // Evita duplicar nodos en la unión de rutas.
+        }
+
+        rutaFinal.append(subRuta);
+        distanciaTotal += distanciaParcial;
+        nodoActual = paradas[i];
+    }
+
+    return rutaFinal;
+}
 
 void Grafo::guardarEnArchivo(const QString& nombreArchivo) const {
     QFile archivo(nombreArchivo);
