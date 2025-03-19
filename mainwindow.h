@@ -73,7 +73,7 @@ private:
     QString listaImagenes[4] = {":/fondos/guia1.png", ":/fondos/guia2.png", ":/fondos/guia3.png", ":/fondos/guia4.png"};
     QVector<QVector<int>> rutasEncontradas;
     QVector<int> rutaElegida;
-    ArbolHistorial arbolHistorial;
+    ArbolRN arbolHistorial;
     QVector<QPair<QString, QString>> historial;
 };
 

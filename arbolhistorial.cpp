@@ -2,137 +2,148 @@
 #include <QString>
 #include <QMessageBox>
 
-ArbolHistorial::ArbolHistorial() : raiz(nullptr) {}
-
-ArbolHistorial::~ArbolHistorial() {
-    // No es necesario limpiar, ya que no hay operaciones adicionales que realizar
+ArbolRN::ArbolRN() {
+    nil = new NodoRN(-1, -1, {}, 0);
+    nil->color = NEGRO;
+    raiz = nil;
 }
 
-void ArbolHistorial::insertar(const QString& ruta) const{
-    NodoHistorial* nuevo = new NodoHistorial(ruta);
-    if (!raiz) {
-        raiz = nuevo;
-        raiz->esRojo = false;
-        return;
-    }
+ArbolRN::~ArbolRN() {
+    limpiar(raiz);
+    delete nil;
+}
 
-    NodoHistorial* actual = raiz;
-    NodoHistorial* padre = nullptr;
-    while (actual) {
+void ArbolRN::limpiar(NodoRN* nodo) {
+    if (nodo != nil) {
+        limpiar(nodo->izquierda);
+        limpiar(nodo->derecha);
+        delete nodo;
+    }
+}
+
+void ArbolRN::rotarIzquierda(NodoRN* x) {
+    NodoRN* y = x->derecha;
+    x->derecha = y->izquierda;
+    if (y->izquierda != nil) y->izquierda->padre = x;
+    y->padre = x->padre;
+    if (x->padre == nullptr) raiz = y;
+    else if (x == x->padre->izquierda) x->padre->izquierda = y;
+    else x->padre->derecha = y;
+    y->izquierda = x;
+    x->padre = y;
+}
+
+void ArbolRN::rotarDerecha(NodoRN* x) {
+    NodoRN* y = x->izquierda;
+    x->izquierda = y->derecha;
+    if (y->derecha != nil) y->derecha->padre = x;
+    y->padre = x->padre;
+    if (x->padre == nullptr) raiz = y;
+    else if (x == x->padre->derecha) x->padre->derecha = y;
+    else x->padre->izquierda = y;
+    y->derecha = x;
+    x->padre = y;
+}
+
+void ArbolRN::balancearInsercion(NodoRN* z) {
+    while (z->padre && z->padre->color == ROJO) {
+        NodoRN* abuelo = z->padre->padre;
+        if (z->padre == abuelo->izquierda) {
+            NodoRN* tio = abuelo->derecha;
+            if (tio->color == ROJO) {
+                z->padre->color = NEGRO;
+                tio->color = NEGRO;
+                abuelo->color = ROJO;
+                z = abuelo;
+            } else {
+                if (z == z->padre->derecha) {
+                    z = z->padre;
+                    rotarIzquierda(z);
+                }
+                z->padre->color = NEGRO;
+                abuelo->color = ROJO;
+                rotarDerecha(abuelo);
+            }
+        } else {
+            NodoRN* tio = abuelo->izquierda;
+            if (tio->color == ROJO) {
+                z->padre->color = NEGRO;
+                tio->color = NEGRO;
+                abuelo->color = ROJO;
+                z = abuelo;
+            } else {
+                if (z == z->padre->izquierda) {
+                    z = z->padre;
+                    rotarDerecha(z);
+                }
+                z->padre->color = NEGRO;
+                abuelo->color = ROJO;
+                rotarIzquierda(abuelo);
+            }
+        }
+    }
+    raiz->color = NEGRO;
+}
+
+void ArbolRN::insertar(int inicio, int fin, const QVector<int>& ruta, double distancia) {
+    NodoRN* nuevo = new NodoRN(inicio, fin, ruta, distancia);
+    NodoRN* padre = nullptr;
+    NodoRN* actual = raiz;
+
+    while (actual != nil) {
         padre = actual;
-        if (ruta < actual->ruta)
+        if (inicio < actual->idInicio || (inicio == actual->idInicio && fin < actual->idFin))
             actual = actual->izquierda;
         else
             actual = actual->derecha;
     }
 
     nuevo->padre = padre;
-    if (ruta < padre->ruta)
+    if (!padre)
+        raiz = nuevo;
+    else if (inicio < padre->idInicio || (inicio == padre->idInicio && fin < padre->idFin))
         padre->izquierda = nuevo;
     else
         padre->derecha = nuevo;
 
+    nuevo->izquierda = nil;
+    nuevo->derecha = nil;
+    nuevo->color = ROJO;
     balancearInsercion(nuevo);
 }
 
-NodoHistorial* ArbolHistorial::buscar(const QString& ruta) const {
-    NodoHistorial* actual = raiz;
-    while (actual) {
-        if (ruta == actual->ruta)
-            return actual;
-        else if (ruta < actual->ruta)
+QVector<int> ArbolRN::buscarRuta(int inicio, int fin, double& distancia) const {
+    NodoRN* actual = raiz;
+    while (actual != nil) {
+        if (inicio == actual->idInicio && fin == actual->idFin) {
+            distancia = actual->distancia;
+            return actual->ruta;
+        }
+        if (inicio < actual->idInicio || (inicio == actual->idInicio && fin < actual->idFin))
             actual = actual->izquierda;
         else
             actual = actual->derecha;
     }
-    return nullptr;  // Si no se encuentra la ruta
+    distancia = -1;
+    return {};
 }
 
-void ArbolHistorial::rotarIzquierda(NodoHistorial* &nodo) const{
-    NodoHistorial* derecho = nodo->derecha;
-    nodo->derecha = derecho->izquierda;
-    if (derecho->izquierda)
-        derecho->izquierda->padre = nodo;
-    derecho->padre = nodo->padre;
-    if (!nodo->padre)
-        raiz = derecho;
-    else if (nodo == nodo->padre->izquierda)
-        nodo->padre->izquierda = derecho;
-    else
-        nodo->padre->derecha = derecho;
-    derecho->izquierda = nodo;
-    nodo->padre = derecho;
+QString ArbolRN::obtenerHistorial() const {
+    return obtenerHistorialHelper(raiz);
 }
 
-void ArbolHistorial::rotarDerecha(NodoHistorial* &nodo) const{
-    NodoHistorial* izquierdo = nodo->izquierda;
-    nodo->izquierda = izquierdo->derecha;
-    if (izquierdo->derecha)
-        izquierdo->derecha->padre = nodo;
-    izquierdo->padre = nodo->padre;
-    if (!nodo->padre)
-        raiz = izquierdo;
-    else if (nodo == nodo->padre->derecha)
-        nodo->padre->derecha = izquierdo;
-    else
-        nodo->padre->izquierda = izquierdo;
-    izquierdo->derecha = nodo;
-    nodo->padre = izquierdo;
-}
+QString ArbolRN::obtenerHistorialHelper(NodoRN* nodo) const {
+    if (nodo == nil) return "";
 
-void ArbolHistorial::balancearInsercion(NodoHistorial* &nodo) const {
-    while (nodo->padre && nodo->padre->esRojo) {
-        NodoHistorial* abuelo = nodo->padre->padre;
-        if (nodo->padre == abuelo->izquierda) {
-            NodoHistorial* tio = abuelo->derecha;
-            if (tio && tio->esRojo) {
-                nodo->padre->esRojo = false;
-                tio->esRojo = false;
-                abuelo->esRojo = true;
-                nodo = abuelo;
-            } else {
-                if (nodo == nodo->padre->derecha) {
-                    nodo = nodo->padre;
-                    rotarIzquierda(nodo);
-                }
-                nodo->padre->esRojo = false;
-                abuelo->esRojo = true;
-                rotarDerecha(abuelo);
-            }
-        } else {
-            NodoHistorial* tio = abuelo->izquierda;
-            if (tio && tio->esRojo) {
-                nodo->padre->esRojo = false;
-                tio->esRojo = false;
-                abuelo->esRojo = true;
-                nodo = abuelo;
-            } else {
-                if (nodo == nodo->padre->izquierda) {
-                    nodo = nodo->padre;
-                    rotarDerecha(nodo);
-                }
-                nodo->padre->esRojo = false;
-                abuelo->esRojo = true;
-                rotarIzquierda(abuelo);
-            }
-        }
-    }
-    raiz->esRojo = false;
-}
-
-QString ArbolHistorial::obtenerHistorial() const {
-    QVector<NodoHistorial*> pila;
-    NodoHistorial* actual = raiz;
     QString historial;
-    while (actual || !pila.isEmpty()) {
-        while (actual) {
-            pila.push_back(actual);
-            actual = actual->izquierda;
-        }
-        actual = pila.back();
-        pila.pop_back();
-        historial += actual->ruta + "\n";
-        actual = actual->derecha;
-    }
+    historial += obtenerHistorialHelper(nodo->izquierda);
+    historial += QString("Ruta: %1 -> %2 | Distancia: %3 km\n")
+                     .arg(nodo->idInicio)
+                     .arg(nodo->idFin)
+                     .arg(nodo->distancia);
+    historial += obtenerHistorialHelper(nodo->derecha);
+
     return historial;
 }
+
+

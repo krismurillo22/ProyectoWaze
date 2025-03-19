@@ -6,7 +6,7 @@
 #include <QString>
 #include <QFile>
 #include <QDataStream>
-#include "ArbolHistorial.h"
+#include "arbolhistorial.h"
 
 struct Nodo {
     int id;
@@ -132,7 +132,6 @@ public:
     void agregarArista(int idNodoOrigen, int idNodoDestino, const QVector<QPoint>& puntosIntermedios);
     QVector<Nodo> obtenerNodos() const;
     QVector<Arista> obtenerAristas() const;
-    void actualizarHistorial(const QString& ruta) const;
     QVector<int> dijkstra(int idNodoInicio, int idNodoFin, double& distanciaTotal) const;
     void guardarEnArchivo(const QString& nombreArchivo) const ;
     void cargarDesdeArchivo(const QString& nombreArchivo);
@@ -140,11 +139,12 @@ public:
     QSet<int> obtenerCiudadesEntre(int idNodoInicio, int idNodoFin) const;
     QVector<int> calcularRutaConParadas(const QVector<int>& paradas, double& distanciaTotal) const;
     QString obtenerNombreNodo(int id) const;
-    ArbolHistorial historialRutas;
+    QVector<int> obtenerRuta(int idNodoInicio, int idNodoFin, double& distanciaTotal);
 
 private:
     AVLTree nodosAVL;
     QVector<Arista> aristas;
+    ArbolRN historialRutas;
     void todasLasRutas(int idNodoInicio, int idNodoFin, QVector<QVector<int>>& rutas, QVector<int> rutaActual, QSet<int> nodosVisitados) const;
 };
 

@@ -142,15 +142,25 @@ void MainWindow::on_pushButton_3_clicked()
     historial.append(qMakePair(nombreOrigen, nombreDestino));
 
     double distanciaTotal = 0;
-    QVector<int> rutaMasCorta = grafo.dijkstra(idOrigen, idDestino, distanciaTotal);
-    double distanciaReal = convertirAPesoReal(distanciaTotal);
+    QVector<int> rutaMasCorta;
+
+    rutaMasCorta = arbolHistorial.buscarRuta(idOrigen, idDestino, distanciaTotal);
+    if (rutaMasCorta.isEmpty()) {
+        // **Si no está, calcularla con Dijkstra y guardarla en el árbol**
+        rutaMasCorta = grafo.dijkstra(idOrigen, idDestino, distanciaTotal);
+        if (!rutaMasCorta.isEmpty()) {
+            arbolHistorial.insertar(idOrigen, idDestino, rutaMasCorta, distanciaTotal);
+        }
+    }
 
     if (rutaMasCorta.isEmpty()) {
         QMessageBox::warning(this, "Sin Ruta", "No hay una ruta disponible entre estas ciudades.");
         return;
     }
 
-    // **Mantener la ruta más corta visible pero sin detenerse en las paradas**
+    double distanciaReal = convertirAPesoReal(distanciaTotal);
+
+    // **Si es transporte público, recalcular con paradas**
     if (ui->comboBoxTipoTransporte->currentText() == "Transporte Público") {
         QVector<int> paradasSeleccionadas = seleccionarParadas(idOrigen, idDestino, rutaMasCorta);
         if (!paradasSeleccionadas.isEmpty()) {
@@ -475,17 +485,12 @@ void MainWindow::on_actionCAMBIAR_COLOR_A_LAS_RUTAS_triggered()
 
 void MainWindow::on_actionVer_Historial_triggered()
 {
+    QString historial = arbolHistorial.obtenerHistorial();
     if (historial.isEmpty()) {
-        QMessageBox::information(this, "Historial", "No hay rutas guardadas.");
-        return;
+        QMessageBox::information(this, "Historial", "No hay rutas en el historial.");
+    } else {
+        QMessageBox::information(this, "Historial de Rutas", historial);
     }
-
-    QString historialTexto;
-    for (const QPair<QString, QString>& ruta : historial) {
-        historialTexto += "Origen: " + ruta.first + " -> Destino: " + ruta.second + "\n";
-    }
-
-    QMessageBox::information(this, "Historial de Rutas", historialTexto);
 }
 
 

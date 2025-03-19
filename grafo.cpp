@@ -32,10 +32,6 @@ QVector<Arista> Grafo::obtenerAristas() const {
     return aristas;
 }
 
-void Grafo::actualizarHistorial(const QString& ruta) const{
-    historialRutas.insertar(ruta);  // Llamas a la función insertar que ahora no es const
-}
-
 QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaTotal) const {
     QMap<int, double> distancias;
     QMap<int, int> previos;
@@ -88,6 +84,26 @@ QVector<int> Grafo::dijkstra(int idNodoInicio, int idNodoFin, double& distanciaT
     }
 
     return ruta;
+}
+
+QVector<int> Grafo::obtenerRuta(int idNodoInicio, int idNodoFin, double& distanciaTotal) {
+    // Primero, buscar en el historial
+    QVector<int> rutaGuardada = historialRutas.buscarRuta(idNodoInicio, idNodoFin, distanciaTotal);
+    if (!rutaGuardada.isEmpty()) {
+        std::cout << "Ruta obtenida del historial con distancia: " << distanciaTotal << std::endl;
+        return rutaGuardada;
+    }
+
+    // Si no está en el historial, ejecutar Dijkstra
+    QVector<int> rutaCalculada = dijkstra(idNodoInicio, idNodoFin, distanciaTotal);
+
+    // Guardar en el historial si se encontró una ruta válida
+    if (!rutaCalculada.isEmpty()) {
+        historialRutas.insertar(idNodoInicio, idNodoFin, rutaCalculada, distanciaTotal);
+        std::cout << "Nueva ruta calculada y guardada en historial." << std::endl;
+    }
+
+    return rutaCalculada;
 }
 
 QString Grafo::obtenerNombreNodo(int id) const {

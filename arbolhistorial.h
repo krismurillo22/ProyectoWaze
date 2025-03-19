@@ -5,29 +5,40 @@
 #include <QString>
 #include <QVector>
 
-struct NodoHistorial {
-    QString ruta;
-    NodoHistorial* padre;
-    NodoHistorial* izquierda;
-    NodoHistorial* derecha;
-    bool esRojo;
+enum Color { ROJO, NEGRO };
 
-    NodoHistorial(const QString& r) : ruta(r), padre(nullptr), izquierda(nullptr), derecha(nullptr), esRojo(true) {}
+struct NodoRN {
+    int idInicio, idFin;
+    QVector<int> ruta;
+    double distancia;
+    Color color;
+    NodoRN* izquierda;
+    NodoRN* derecha;
+    NodoRN* padre;
+
+    NodoRN(int inicio, int fin, const QVector<int>& r, double d)
+        : idInicio(inicio), idFin(fin), ruta(r), distancia(d),
+          color(ROJO), izquierda(nullptr), derecha(nullptr), padre(nullptr) {}
 };
 
-class ArbolHistorial {
+class ArbolRN {
 private:
-    mutable NodoHistorial* raiz;
-    void rotarIzquierda(NodoHistorial* &nodo) const;
-    void rotarDerecha(NodoHistorial* &nodo) const;
-    void balancearInsercion(NodoHistorial* &nodo) const;
+    NodoRN* raiz;
+    NodoRN* nil; // Nodo nulo para facilitar balanceo
+
+    void rotarIzquierda(NodoRN* x);
+    void rotarDerecha(NodoRN* x);
+    void balancearInsercion(NodoRN* z);
+    void limpiar(NodoRN* nodo);
 
 public:
-    ArbolHistorial();
-    ~ArbolHistorial();
-    void insertar(const QString& ruta) const;
-    NodoHistorial* buscar(const QString& ruta) const;
+    ArbolRN();
+    ~ArbolRN();
+    void insertar(int inicio, int fin, const QVector<int>& ruta, double distancia);
+    QVector<int> buscarRuta(int inicio, int fin, double& distancia) const;
     QString obtenerHistorial() const;
+    QString obtenerHistorialHelper(NodoRN* nodo) const;
 };
+
 
 #endif // ARBOLHISTORIAL_H
